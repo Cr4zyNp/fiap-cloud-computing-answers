@@ -1,0 +1,36 @@
+service: event-filter
+
+frameworkVersion: '3'
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+  iam:
+    role: !Sub arn:aws:iam::${AWS::AccountId}:role/LabRole
+  eventBridge:
+    useCloudFormation: true
+
+functions:
+  source:
+    handler: handler.sourceHandler
+    events:
+      - eventBridge:
+          eventBus:
+            - arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/Orders
+          pattern:
+            source:
+              - com.aws.orders
+  detail:
+    handler: handler.detailHandler
+    events:
+      - eventBridge:
+          eventBus:
+            - arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/Orders
+          pattern:
+            source:
+              - com.aws.orders
+            detail-type:
+              - Order Notification
+            detail:
+              location:
+                - eu-west
