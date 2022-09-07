@@ -1,0 +1,50 @@
+service: trabalho-final-event-filter-2
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+  iam:
+    role: !Sub arn:aws:iam::${AWS::AccountId}:role/LabRole
+  environment:
+    awsRegion: ${aws:region}
+    awsAccountId: ${aws:accountId}
+  eventBridge:
+    useCloudFormation: true  
+    
+functions:
+  entregue:
+    CodeUri: ./lambda_entregue
+    handler: lambda_entregue/app.entregueHandler
+    events:
+      - sqs:
+          arn: arn:aws:sqs:${aws:region}:${aws:accountId}:espera-entrega
+          batchSize: 1
+          enabled: true
+          
+  enviarSQS:
+    CodeUri: ./lambda_enviarSQS
+    handler: lambda_enviarSQS/app.enviarSQSHandler
+    events:
+      - eventBridge:
+          eventBus:
+            - arn:aws:events:${aws:region}:${aws:accountId}:event-bus/pizzaria
+          pattern:
+            source:
+              - com.pizza.status
+            detail:
+              status:
+                - pronto
+                
+  gravarEvento:
+    CodeUri: ./lambda_evento
+    handler: lambda_evento/app.gravarBancoHandler
+    events:
+      - eventBridge:
+          eventBus:
+            - arn:aws:events:${aws:region}:${aws:accountId}:event-bus/pizzaria
+          pattern:
+            source:
+              - com.pizza.status
