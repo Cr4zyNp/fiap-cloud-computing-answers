@@ -16,7 +16,6 @@ provider:
     
 functions:
   entregue:
-    CodeUri: ./lambda_entregue
     handler: lambda_entregue/app.entregueHandler
     events:
       - sqs:
@@ -25,7 +24,6 @@ functions:
           enabled: true
           
   enviarSQS:
-    CodeUri: ./lambda_enviarSQS
     handler: lambda_enviarSQS/app.enviarSQSHandler
     events:
       - eventBridge:
@@ -39,7 +37,6 @@ functions:
                 - pronto
                 
   gravarEvento:
-    CodeUri: ./lambda_evento
     handler: lambda_evento/app.gravarBancoHandler
     events:
       - eventBridge:

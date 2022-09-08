@@ -11,11 +11,13 @@ def entregueHandler(event,context):
 
     while(True):
         response = sqs.getMessage(1)
-        if(len(response['Messages']) == 0):
+        print(response)
+        mensagem = response.get('Messages')
+        if mensagem:
+            mensagens = []
+            for msg in response['Messages']:
+                #mensagens.append({'Id':msg['MessageId'], 'ReceiptHandle':msg['ReceiptHandle']})    
+                #sqs.deleteMessage(mensagens)
+                sqs.deleteMessage(msg['ReceiptHandle'])
+        else:
             break
-    
-        mensagens = []
-        for msg in response['Messages']:
-            #mensagens.append({'Id':msg['MessageId'], 'ReceiptHandle':msg['ReceiptHandle']})    
-            #sqs.deleteMessage(mensagens)
-            sqs.deleteMessage(msg['ReceiptHandle'])
